@@ -9,14 +9,18 @@ const {
 	GraphQLNonNull
 } = require("graphql");
 
-/*
-// Hard Coded Data
-const customers = [
-	{ id: "1", name: "John Doe", email: "jdoe@gmail.com", age: 35 },
-	{ id: "2", name: "Steve Doe", email: "steve@gmail.com", age: 55 },
-	{ id: "3", name: "Dave Doe", email: "dave@gmail.com", age: 25 }
-];
-*/
+// User Type - JSONPlaceholder
+const UserType = new GraphQLObjectType({
+	name: "User",
+	fields: () => ({
+		id: { type: GraphQLString },
+		name: { type: GraphQLString },
+		username: { type: GraphQLString },
+		city: { type: GraphQLString },
+		company: { type: GraphQLString },
+		catchphrase: { type: GraphQLString }
+	})
+});
 
 // Customer Type
 const CustomerType = new GraphQLObjectType({
@@ -39,11 +43,6 @@ const RootQuery = new GraphQLObjectType({
 				id: { type: GraphQLString }
 			},
 			resolve(parentValue, args) {
-				// for (let i = 0; i < customers.length; i++) {
-				// 	if (customers[i].id == args.id) {
-				// 		return customers[i];
-				// 	}
-				// }
 				return axios
 					.get("http://localhost:3000/customers/" + args.id)
 					.then(res => res.data);
@@ -54,6 +53,25 @@ const RootQuery = new GraphQLObjectType({
 			resolve(parentValue, args) {
 				return axios
 					.get("http://localhost:3000/customers/")
+					.then(res => res.data);
+			}
+		},
+		user: {
+			type: UserType,
+			args: {
+				id: { type: GraphQLString }
+			},
+			resolve(parentValue, args) {
+				return axios
+					.get("https://jsonplaceholder.typicode.com/users" + args.id)
+					.then(res => res.data);
+			}
+		},
+		users: {
+			type: new GraphQLList(UserType),
+			resolve(parentValue, args) {
+				return axios
+					.get(`https://jsonplaceholder.typicode.com/users`)
 					.then(res => res.data);
 			}
 		}
